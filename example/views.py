@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import stripe
 from example.services.paypal_service import make_paypal_payment, get_paypal_payment_by_id, get_all_paypal_payments, execute_paypal_payment
-from .models import PayPalPayment, User, typeOfConfig, Pet, PetImage
+from .models import PayPalPayment, User, typeOfConfig, Pet, PetImage, PetVisit, PetVaccination
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -401,6 +401,28 @@ class PetImagesViewSet(viewsets.GenericViewSet, mixins.DestroyModelMixin,  mixin
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = serializer.PetImageSerializer
     permission_classes = [IsAuthenticated]
+
+class PetVisitViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+    queryset = PetVisit.objects.all()
+    serializer_class = serializer.PetVisitSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['get'], url_path='by-pet/(?P<pet_id>[^/.]+)')
+    def get_by_pet(self, request, pet_id=None):
+        visits = PetVisit.objects.filter(pet_id=pet_id)
+        serializer = self.get_serializer(visits, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+class PetVaccinationViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+    queryset = PetVaccination.objects.all()
+    serializer_class = serializer.PetVaccinationSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['get'], url_path='by-pet/(?P<pet_id>[^/.]+)')
+    def get_by_pet(self, request, pet_id=None):
+        vaccinations = PetVaccination.objects.filter(pet_id=pet_id)
+        serializer = self.get_serializer(vaccinations, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 class AuthViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()

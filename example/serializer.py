@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import PayPalPayment, PetImage, User,typeOfConfig , Pet
+from .models import PayPalPayment, PetImage, User,typeOfConfig , Pet, PetVisit, PetVaccination
 from datetime import date
 from .choices import ProjectStatus
 from django.contrib.auth.hashers import make_password
@@ -194,4 +194,16 @@ class PayPalPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PayPalPayment
+        fields = '__all__'
+
+
+class PetVisitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetVisit
+        fields = '__all__'
+
+
+class PetVaccinationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetVaccination
         fields = '__all__'

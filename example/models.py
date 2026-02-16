@@ -92,3 +92,127 @@ class PayPalPayment(models.Model):
     enableTax = models.BooleanField(default=False)
     class Meta:
         ordering = ['-created_at']
+
+
+
+
+
+class PetVisit(basedModel):
+    VISIT_TYPE_CHOICES = [
+        ("checkup", "Checkup"),
+        ("emergency", "Emergency"),
+        ("surgery", "Surgery"),
+        ("grooming", "Grooming"),
+        ("follow_up", "Follow Up"),
+        ("other", "Other"),
+    ]
+
+    STATUS_CHOICES = [
+        ("upcoming", "Upcoming"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+
+    pet = models.ForeignKey(
+        "Pet",
+        on_delete=models.CASCADE,
+        related_name="visits"
+    )
+
+    visit_type = models.CharField(
+        max_length=50,
+        choices=VISIT_TYPE_CHOICES,
+        default="checkup"
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="upcoming"
+    )
+
+    visit_date = models.DateField()
+
+    veterinarian_name = models.CharField(max_length=255)
+    clinic_name = models.CharField(max_length=255, null=True, blank=True)
+
+    # Medical Details
+    diagnosis = models.TextField(null=True, blank=True)
+    treatment = models.TextField(null=True, blank=True)
+    prescriptions = models.TextField(null=True, blank=True)
+
+    # Vitals
+    weight = models.FloatField(null=True, blank=True)
+    temperature = models.FloatField(null=True, blank=True)
+
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.pet.name} - {self.visit_type} ({self.visit_date})"
+
+class PetVaccination(basedModel):
+    STATUS_CHOICES = [
+        ("due", "Due"),
+        ("completed", "Completed"),
+        ("upcoming", "Upcoming"),
+    ]
+
+    CATEGORY_CHOICES = [
+        ("core", "Core"),
+        ("non_core", "Non-Core"),
+        ("optional", "Optional"),
+    ]
+
+    ROUTE_CHOICES = [
+        ("subcutaneous", "Subcutaneous"),
+        ("intramuscular", "Intramuscular"),
+        ("oral", "Oral"),
+        ("intranasal", "Intranasal"),
+        ("other", "Other"),
+    ]
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+
+    pet = models.ForeignKey(
+        "Pet",
+        on_delete=models.CASCADE,
+        related_name="vaccinations"
+    )
+
+    vaccine_name = models.CharField(max_length=255)
+
+    status = models.CharField(
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default="due"
+    )
+
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default="core"
+    )
+
+    date_given = models.DateField(null=True, blank=True)
+    next_due_date = models.DateField(null=True, blank=True)
+
+    veterinarian_name = models.CharField(max_length=255)
+    clinic_name = models.CharField(max_length=255, null=True, blank=True)
+
+    manufacturer = models.CharField(max_length=255, null=True, blank=True)
+    batch_number = models.CharField(max_length=255, null=True, blank=True)
+
+    dosage = models.CharField(max_length=100, null=True, blank=True)
+    route = models.CharField(
+        max_length=50,
+        choices=ROUTE_CHOICES,
+        null=True,
+        blank=True
+    )
+
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.pet.name} - {self.vaccine_name}"
